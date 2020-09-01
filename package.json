@@ -10,7 +10,8 @@
     "dev": "nodemon src/index.ts",
     "start": "ts-node src/index.ts",
     "lint": "eslint . --ignore-pattern node_modules/ --ext .ts,.tsx --quiet --fix",
-    "seed": "ts-node temp/seed.ts"
+    "seed": "ts-node temp/seed.ts",
+    "clear": "ts-node temp/clear.ts"
   },
   "author": "Ivsath",
   "license": "ISC",

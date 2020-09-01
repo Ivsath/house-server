@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 import { connectDatabase } from '../src/database';
-import { listings } from './listings';
+import { listings, users } from './data';
 
 const seed = async () => {
   try {
@@ -11,6 +11,10 @@ const seed = async () => {
 
     for (const listing of listings) {
       await db.listings.insertOne(listing);
+    }
+
+    for (const user of users) {
+      await db.users.insertOne(user);
     }
 
     console.log('[seed] : success');
