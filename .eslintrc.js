@@ -27,5 +27,14 @@ module.exports = {
         endOfLine: 'auto',
       },
     ],
+    '@typescript-eslint/ban-types': [
+      'error',
+      {
+        extendDefaults: true,
+        types: {
+          '{}': false,
+        },
+      },
+    ],
   },
 };
