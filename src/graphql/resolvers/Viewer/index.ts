@@ -114,6 +114,7 @@ const logInViaCookie = async (
 
   return viewer;
 };
+
 export const viewerResolvers: IResolvers = {
   Query: {
     authUrl: () => {
