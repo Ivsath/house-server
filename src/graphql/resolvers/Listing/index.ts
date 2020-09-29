@@ -45,5 +45,8 @@ export const listingResolvers: IResolvers = {
       }
       return host;
     },
+    bookingsIndex: (listing: Listing): string => {
+      return JSON.stringify(listing.bookingsIndex);
+    },
   },
 };
