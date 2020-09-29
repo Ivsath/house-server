@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 
 import { Database, Listing, User } from '../../../lib/types';
 import { authorize } from '../../../lib/utils';
-import { ListingArgs } from './types';
+import { ListingArgs, ListingBookingsArgs, ListingBookingsData } from './types';
 
 export const listingResolvers: IResolvers = {
   Query: {
@@ -47,6 +47,38 @@ export const listingResolvers: IResolvers = {
     },
     bookingsIndex: (listing: Listing): string => {
       return JSON.stringify(listing.bookingsIndex);
+    },
+    bookings: async (
+      listing: Listing,
+      { limit, page }: ListingBookingsArgs,
+      { db }: { db: Database },
+    ): Promise<ListingBookingsData | null> => {
+      try {
+        if (!listing.authorized) {
+          return null;
+        }
+
+        const data: ListingBookingsData = {
+          total: 0,
+          result: [],
+        };
+
+        let cursor = await db.bookings.find({
+          _id: { $in: listing.bookings },
+        });
+
+        cursor = cursor.skip(page > 0 ? (page - 1) * limit : 0);
+        // page = 1; limit = 10; cursor starts at 0
+        // page = 2; limit = 10; cursor starts at 10
+        cursor = cursor.limit(limit);
+
+        data.total = await cursor.count();
+        data.result = await cursor.toArray();
+
+        return data;
+      } catch (error) {
+        throw new Error(`Failed to query listing bookings: ${error}`);
+      }
     },
   },
 };
