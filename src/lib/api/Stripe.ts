@@ -1,4 +1,3 @@
-import { response } from 'express';
 import stripe from 'stripe';
 
 const client = new stripe(`${process.env.S_SECRET_KEY}`, {
