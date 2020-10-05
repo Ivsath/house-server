@@ -12,10 +12,6 @@ export const Stripe = {
       code,
     });
 
-    if (!response) {
-      return new Error('Failed to connect with Stripe');
-    }
-
     return response;
   },
 };
