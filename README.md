@@ -1,5 +1,4 @@
-# Graphql minimal server
+# Graphql server
 
-## yarn
-
-## yarn dev
+  yarn
+  yarn dev
