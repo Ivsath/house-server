@@ -13,4 +13,21 @@ export const Stripe = {
 
     return response;
   },
+  charge: async (amount: number, source: string, stripeAccount: string) => {
+    const paymentIntent = await client.paymentIntents.create(
+      {
+        payment_method_types: [source],
+        amount,
+        currency: 'usd',
+        application_fee_amount: Math.round(amount * 0.05),
+      },
+      {
+        stripeAccount: stripeAccount,
+      },
+    );
+
+    if (paymentIntent.status !== 'succeeded') {
+      throw new Error('Failed to create charge with stripe');
+    }
+  },
 };
