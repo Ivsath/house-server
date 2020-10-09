@@ -27,6 +27,8 @@ import { CreateBookingArgs } from './types';
 //
 // NOTE: the JavaScript function for getting the month returns 0 for Jan ... and 11 for Dec
 
+const millisecondsPerDay = 86400000;
+
 const resolveBookingsIndex = (
   bookingsIndex: BookingsIndex,
   checkInDate: string,
@@ -89,11 +91,30 @@ export const bookingResolvers: IResolvers = {
           throw new Error("Viewer can't book own listing");
         }
 
+        const today = new Date();
         const checkInDate = new Date(checkIn);
         const checkOutDate = new Date(checkOut);
 
         if (checkOutDate < checkInDate) {
           throw new Error("Check out date can't be before check in date");
+        }
+
+        if (
+          checkInDate.getTime() >
+          today.getTime() + 365 * millisecondsPerDay
+        ) {
+          throw new Error(
+            "Check in date can't be more than one year from today",
+          );
+        }
+
+        if (
+          checkOutDate.getTime() >
+          today.getTime() + 365 * millisecondsPerDay
+        ) {
+          throw new Error(
+            "Check out date can't be more than one year from today",
+          );
         }
 
         // Create a new bookingsIndex for listing being booked
