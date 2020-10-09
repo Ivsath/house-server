@@ -118,40 +118,44 @@ export const listingResolvers: IResolvers = {
       { input }: HostListingArgs,
       { db, req }: { db: Database; req: Request },
     ): Promise<Listing> => {
-      verifyHostListingInput(input);
+      try {
+        verifyHostListingInput(input);
 
-      const viewer = await authorize(db, req);
-      if (!viewer) {
-        throw new Error('Viewer could not be found');
+        const viewer = await authorize(db, req);
+        if (!viewer) {
+          throw new Error('Viewer could not be found');
+        }
+
+        const { country, admin, city } = await Google.geocode(input.address);
+        if (!country || !admin || !city) {
+          throw new Error('Invalid address input');
+        }
+
+        const imageUrl = await Cloudinary.upload(input.image);
+
+        const insertResult = await db.listings.insertOne({
+          _id: new ObjectId(),
+          ...input,
+          image: imageUrl,
+          bookings: [],
+          bookingsIndex: {},
+          country,
+          admin,
+          city,
+          host: viewer._id,
+        });
+
+        const insertedListing: Listing = insertResult.ops[0];
+
+        await db.users.updateOne(
+          { _id: viewer._id },
+          { $push: { listings: insertedListing._id } },
+        );
+
+        return insertedListing;
+      } catch (error) {
+        throw new Error(`Failed to create listing: ${error}`);
       }
-
-      const { country, admin, city } = await Google.geocode(input.address);
-      if (!country || !admin || !city) {
-        throw new Error('Invalid address input');
-      }
-
-      const imageUrl = await Cloudinary.upload(input.image);
-
-      const insertResult = await db.listings.insertOne({
-        _id: new ObjectId(),
-        ...input,
-        image: imageUrl,
-        bookings: [],
-        bookingsIndex: {},
-        country,
-        admin,
-        city,
-        host: viewer._id,
-      });
-
-      const insertedListing: Listing = insertResult.ops[0];
-
-      await db.users.updateOne(
-        { _id: viewer._id },
-        { $push: { listings: insertedListing._id } },
-      );
-
-      return insertedListing;
     },
   },
   Listing: {
