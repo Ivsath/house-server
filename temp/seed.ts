@@ -10,11 +10,11 @@ const seed = async () => {
     const db = await connectDatabase();
 
     for (const listing of listings) {
-      await db.listings.insertOne(listing);
+      await db.listings.create(listing).save();
     }
 
     for (const user of users) {
-      await db.users.insertOne(user);
+      await db.users.create(user).save();
     }
 
     console.log('[seed] : success');
